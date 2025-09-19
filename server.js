@@ -1,11 +1,12 @@
-const { createServer } = require('http');
-const { parse } = require('url');
-const next = require('next');
-const { Server } = require('socket.io');
-const { Pool } = require('pg');
+require("dotenv").config({ path: ".env.local" });
+const { createServer } = require("http");
+const { parse } = require("url");
+const next = require("next");
+const { Server } = require("socket.io");
+const { Pool } = require("pg");
 
-const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
+const dev = process.env.NODE_ENV !== "production";
+const hostname = "localhost";
 const port = process.env.PORT || 3000;
 
 const app = next({ dev, hostname, port });
@@ -17,7 +18,7 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: false
+  ssl: false,
 });
 
 let lastRowCount = 0;
@@ -28,31 +29,33 @@ app.prepare().then(() => {
       const parsedUrl = parse(req.url, true);
       await handle(req, res, parsedUrl);
     } catch (err) {
-      console.error('Error occurred handling', req.url, err);
+      console.error("Error occurred handling", req.url, err);
       res.statusCode = 500;
-      res.end('internal server error');
+      res.end("internal server error");
     }
   });
 
   const io = new Server(server, {
     cors: {
       origin: "*",
-      methods: ["GET", "POST"]
-    }
+      methods: ["GET", "POST"],
+    },
   });
 
-  io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
+  io.on("connection", (socket) => {
+    console.log("Client connected:", socket.id);
 
-    socket.on('disconnect', () => {
-      console.log('Client disconnected:', socket.id);
+    socket.on("disconnect", () => {
+      console.log("Client disconnected:", socket.id);
     });
   });
 
   // Database monitoring
   const checkForChanges = async () => {
     try {
-      const result = await pool.query('SELECT COUNT(*) as count FROM "CrcV2_OIC_OpenMiddlewareTransfer"');
+      const result = await pool.query(
+        'SELECT COUNT(*) as count FROM "CrcV2_OIC_OpenMiddlewareTransfer"',
+      );
       const currentCount = parseInt(result.rows[0].count);
 
       if (lastRowCount === 0) {
@@ -62,17 +65,17 @@ app.prepare().then(() => {
         const newRows = currentCount - lastRowCount;
         console.log(`New rows detected: ${newRows}`);
 
-        io.emit('db-change', {
-          table: 'CrcV2_OIC_OpenMiddlewareTransfer',
+        io.emit("db-change", {
+          table: "CrcV2_OIC_OpenMiddlewareTransfer",
           newRows: newRows,
           totalRows: currentCount,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
 
         lastRowCount = currentCount;
       }
     } catch (error) {
-      console.error('Database monitoring error:', error);
+      console.error("Database monitoring error:", error);
     }
   };
 
