@@ -15,6 +15,13 @@ export default function HomePage() {
   return (
     <div>
       <div id="maincontent">
+        <div style={{ textAlign: "center", marginBottom: "30px" }}>
+          <img
+            src="/OIC_Logo_Black_2x.png"
+            alt="Open Internet Club"
+            style={{ maxWidth: "200px", height: "auto" }}
+          />
+        </div>
         <h2>Open Internet Club</h2>
 
         <p>

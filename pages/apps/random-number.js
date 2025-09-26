@@ -68,6 +68,13 @@ export default function RandomNumberApp() {
   return (
     <div style={OICStyles.container}>
       <div style={OICStyles.content}>
+        <div style={{ textAlign: "center", marginBottom: "30px" }}>
+          <img
+            src="/OIC_Logo_Black_2x.png"
+            alt="Open Internet Club"
+            style={{ maxWidth: "200px", height: "auto" }}
+          />
+        </div>
         <h2 style={OICStyles.h2}>Random Number Generator</h2>
 
         <p>
