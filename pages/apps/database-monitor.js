@@ -5,44 +5,79 @@ const metadata = {
   appId: "database-monitor",
   title: "Database Monitor",
   description:
-    "Pay 1 $OPEN to activate real-time database monitoring for 60 seconds.",
-  amount: 1,
+    "Pay $OPEN tokens to activate real-time database monitoring. Different amounts give different durations.",
   recipient: "0xf48554937f18885c7f15c432c596b5843648231d", // Required recipient address
   initialState: {
     qrCode: "",
     monitoringActive: false,
   },
-  onPayment: (eventData, appState, setAppState) => {
+  onPayment: (
+    eventData,
+    appState,
+    setAppState,
+    currentAmount,
+    setCurrentAmount,
+  ) => {
     console.log("Monitor activation event received:", eventData);
 
-    setAppState((prev) => ({
-      ...prev,
-      monitoringActive: true,
-    }));
+    // Parse the amount from the event data (assuming it's in wei)
+    const receivedAmount = Math.floor(
+      Number(eventData.amount) / Math.pow(10, 18),
+    );
 
-    // Start monitoring for 60 seconds
-    setTimeout(() => {
+    // Check if the payment matches any valid amount
+    if ([1, 5, 10, 30].includes(receivedAmount)) {
+      const duration = receivedAmount * 60 * 1000; // 1 token = 60 seconds
+
       setAppState((prev) => ({
         ...prev,
-        monitoringActive: false,
+        monitoringActive: true,
+        paidAmount: receivedAmount,
+        endTime: Date.now() + duration,
       }));
-    }, 60000);
+
+      // Start monitoring for the paid duration
+      setTimeout(() => {
+        setAppState((prev) => ({
+          ...prev,
+          monitoringActive: false,
+        }));
+      }, duration);
+    }
   },
 };
 
-const appContent = ({ appState, setAppState, generateQR, metadata }) => {
-  // Generate QR code on mount
+const appContent = ({
+  appState,
+  setAppState,
+  currentAmount,
+  setCurrentAmount,
+  generateQR,
+  metadata,
+}) => {
+  // Generate QR code when amount changes
   useEffect(() => {
-    generateQRCode();
-  }, []);
+    if (currentAmount > 0) {
+      generateQRCode();
+    }
+  }, [currentAmount]);
 
   const generateQRCode = async () => {
     try {
-      const result = await generateQR(metadata.amount, metadata.appId);
+      const result = await generateQR(currentAmount, metadata.appId);
       setAppState((prev) => ({ ...prev, qrCode: result.qrCode }));
     } catch (error) {
       console.error("Failed to generate QR code:", error);
     }
+  };
+
+  const handleAmountSelect = (amount) => {
+    setCurrentAmount(amount);
+    setAppState((prev) => ({
+      ...prev,
+      isWaiting: true,
+    }));
+    generateQRCode();
   };
 
   return (
@@ -62,30 +97,39 @@ const appContent = ({ appState, setAppState, generateQR, metadata }) => {
           </h3>
           <p style={{ margin: "5px 0", fontSize: "14px" }}>
             Watching for database events in real-time...
+            <br />
+            Duration: {appState.paidAmount} minutes (paid {appState.paidAmount}{" "}
+            $OPEN)
           </p>
         </div>
       )}
 
-      <div
-        style={{
-          textAlign: "center",
-          margin: "30px 0",
-        }}
-      >
-        <button
-          onClick={generateQRCode}
+      <div style={{ margin: "30px 0" }}>
+        <h3 style={OICStyles.h3}>Select Monitoring Duration</h3>
+        <div
           style={{
-            ...OICStyles.button,
-            ...OICStyles.buttonPrimary,
-            padding: "12px 24px",
-            fontSize: "16px",
+            display: "flex",
+            gap: "10px",
+            justifyContent: "center",
+            flexWrap: "wrap",
           }}
-          disabled={appState.monitoringActive}
         >
-          {appState.monitoringActive
-            ? "Monitoring Active..."
-            : "Pay 1 CRC to Monitor"}
-        </button>
+          {[1, 5, 10, 30].map((minutes) => (
+            <button
+              key={minutes}
+              onClick={() => handleAmountSelect(minutes)}
+              style={{
+                ...OICStyles.button,
+                ...(currentAmount === minutes ? OICStyles.buttonPrimary : {}),
+                padding: "8px 16px",
+                fontSize: "14px",
+              }}
+              disabled={appState.monitoringActive}
+            >
+              {minutes} $OPEN ({minutes} min)
+            </button>
+          ))}
+        </div>
       </div>
 
       {appState.qrCode && !appState.monitoringActive && (
@@ -99,7 +143,7 @@ const appContent = ({ appState, setAppState, generateQR, metadata }) => {
             style={{ maxWidth: "250px" }}
           />
           <p style={{ margin: "10px 0", fontSize: "14px", color: "#666" }}>
-            Cost: {metadata.amount} $OPEN • Duration: 60 seconds
+            Cost: {currentAmount} $OPEN • Duration: {currentAmount} minutes
           </p>
         </div>
       )}

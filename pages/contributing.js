@@ -104,20 +104,43 @@ const metadata = {
   appId: 'your-app-name',
   title: 'Your App Title',
   description: 'Brief description of what your app does.',
-  amount: 1, // Cost in $OPEN tokens
   recipient: '0xYourAddressHere', // Where $OPEN tokens are sent (required)
   initialState: {
     // Your app's initial state
   },
-  onPayment: (eventData, appState, setAppState) => {
-    // What happens when payment is received
-    setAppState(prev => ({ ...prev, /* update state */ }));
+  onPayment: (eventData, appState, setAppState, currentAmount, setCurrentAmount) => {
+    // Parse the amount from the event data
+    const receivedAmount = Math.floor(Number(eventData.amount) / Math.pow(10, 18));
+
+    // Check if payment is valid and handle accordingly
+    if (receivedAmount > 0) {
+      setAppState(prev => ({ ...prev, /* update based on receivedAmount */ }));
+    }
   },
 };
 
-const appContent = ({ appState, setAppState, generateQR, metadata }) => {
+const appContent = ({
+  appState,
+  setAppState,
+  currentAmount,
+  setCurrentAmount,
+  generateQR,
+  metadata
+}) => {
+  // Handle user selecting different amounts
+  const handleAmountSelect = (amount) => {
+    setCurrentAmount(amount);
+    generateQR(amount, metadata.appId); // Generate QR for selected amount
+  };
+
   return (
     <>
+      {/* Amount selection buttons */}
+      {[1, 5, 10].map(amount => (
+        <button key={amount} onClick={() => handleAmountSelect(amount)}>
+          Pay {amount} $OPEN
+        </button>
+      ))}
       {/* Your app's UI content goes here */}
       {/* The framework handles logo, title, navigation automatically */}
     </>
@@ -125,6 +148,25 @@ const appContent = ({ appState, setAppState, generateQR, metadata }) => {
 };
 
 export default createOICApp(metadata, appContent);`}</pre>
+
+        <h3>Dynamic Amounts</h3>
+        <p>
+          The framework supports dynamic amounts based on user actions. Users
+          can select different amounts which change the app behavior:
+        </p>
+        <ul>
+          <li>
+            Use <code>currentAmount</code> and <code>setCurrentAmount</code> in
+            your app
+          </li>
+          <li>
+            Generate QR codes with <code>generateQR(amount, appId)</code>
+          </li>
+          <li>
+            Parse received amounts in your <code>onPayment</code> handler
+          </li>
+          <li>Different amounts can trigger different app behaviors</li>
+        </ul>
 
         <h3>Design Guidelines</h3>
         <ul>
@@ -139,7 +181,7 @@ export default createOICApp(metadata, appContent);`}</pre>
             status
           </li>
           <li>Keep your app content minimal and focused</li>
-          <li>Define your app behavior in the metadata object</li>
+          <li>Let users select amounts that change app functionality</li>
         </ul>
 
         <h3>Metadata Options</h3>
@@ -154,9 +196,6 @@ export default createOICApp(metadata, appContent);`}</pre>
             <code>description</code>: Brief description shown to users
           </li>
           <li>
-            <code>amount</code>: Cost in $OPEN tokens (defaults to 1)
-          </li>
-          <li>
             <code>recipient</code>: Ethereum address where $OPEN tokens are
             forwarded as ERC20 tokens (required)
           </li>
@@ -164,7 +203,9 @@ export default createOICApp(metadata, appContent);`}</pre>
             <code>initialState</code>: Your app's initial state object
           </li>
           <li>
-            <code>onPayment</code>: Function called when payment is received
+            <code>onPayment</code>: Function called when payment is received,
+            receives (eventData, appState, setAppState, currentAmount,
+            setCurrentAmount)
           </li>
         </ul>
 
