@@ -1,35 +1,17 @@
 import Link from "next/link";
-import { useState, useEffect } from "react";
 
 const APPS = [
   {
     id: "random-number",
     name: "Random Number Generator",
-    description: "Pay 1 CRC to generate a random number between 1 and 1000",
-    author: "OIC Team",
-    version: "1.0",
   },
   {
     id: "database-monitor",
     name: "Database Monitor",
-    description: "Pay 1 CRC to monitor live blockchain events for 60 seconds",
-    author: "OIC Team",
-    version: "1.0",
   },
 ];
 
 export default function HomePage() {
-  const [currentTime, setCurrentTime] = useState("");
-
-  useEffect(() => {
-    const updateTime = () => {
-      setCurrentTime(new Date().toLocaleString());
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div>
       <div id="maincontent">
@@ -40,55 +22,17 @@ export default function HomePage() {
           apps that interact with blockchain technology in creative ways.
         </p>
 
-        <p>
-          Current time: <strong>{currentTime}</strong>
-        </p>
-
-        <h3>Available Apps</h3>
+        <h3>Apps</h3>
         <ul>
           {APPS.map((app) => (
             <li key={app.id}>
-              <Link href={`/apps/${app.id}`}>
-                <strong>{app.name}</strong>
-              </Link>
-              <br />
-              {app.description}
-              <br />
-              <small>
-                by {app.author} (v{app.version})
-              </small>
+              <Link href={`/apps/${app.id}`}>{app.name}</Link>
             </li>
           ))}
         </ul>
 
-        <h3>How it works</h3>
         <p>
-          Each app generates QR codes that interact with the Circles protocol.
-          Pay CRC tokens to trigger different app behaviors - from generating
-          random numbers to monitoring live blockchain data. Scan the codes with
-          a compatible wallet to participate!
-        </p>
-
-        <h3>Contributing</h3>
-        <p>
-          Want to add your own app? Check out the{" "}
-          <a href="https://github.com/pboes/oic_apps" target="_blank">
-            GitHub repository
-          </a>{" "}
-          and submit a pull request.
-        </p>
-
-        <hr />
-
-        <p>
-          <small>
-            Built with curiosity and minimal dependencies.
-            <br />
-            Inspired by the early web when everything was an experiment.
-            <br />
-            Each app uses a unique identifier and amount to trigger different
-            behaviors.
-          </small>
+          <Link href="/contributing">Contributing</Link>
         </p>
       </div>
 
@@ -125,8 +69,7 @@ export default function HomePage() {
         }
 
         li {
-          margin: 15px 0;
-          line-height: 1.6;
+          margin: 10px 0;
         }
 
         a {
@@ -136,21 +79,6 @@ export default function HomePage() {
 
         a:hover {
           color: #004499;
-        }
-
-        strong {
-          font-weight: 600;
-        }
-
-        small {
-          color: #666;
-          font-size: 14px;
-        }
-
-        hr {
-          border: none;
-          border-top: 1px solid #eee;
-          margin: 40px 0;
         }
 
         @media (max-width: 600px) {
