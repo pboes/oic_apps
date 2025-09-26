@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { value, data, customData } = req.body;
+    const { value, data, customData, recipient } = req.body;
 
     if (!value) {
       return res.status(400).json({ error: "Value is required" });
@@ -32,14 +32,15 @@ export default async function handler(req, res) {
 
     // Set the required parameters
     const onBehalf = ethers.ZeroAddress; // null address
-    const recipient = "0xf48554937f18885c7f15c432c596b5843648231d";
+    const recipientAddress =
+      recipient || "0xf48554937f18885c7f15c432c596b5843648231d";
     const amount = parseInt(value);
 
     // Combine appId and customData if provided
     const dataField = customData ? `${data}:${customData}` : data;
 
     // Pack the data using the packData function
-    const packedData = packData(onBehalf, recipient, dataField);
+    const packedData = packData(onBehalf, recipientAddress, dataField);
 
     // Create the app.metri.xyz URL
     const kitchenUrl = `https://app.metri.xyz/transfer/0x6fff09332ae273ba7095a2a949a7f4b89eb37c52/crc/${amount}?data=${packedData}`;
@@ -61,6 +62,7 @@ export default async function handler(req, res) {
       amount: amount,
       appId: data,
       customData: customData,
+      recipient: recipientAddress,
       data: dataField, // Full data field including custom data
       url: kitchenUrl,
       packedData: packedData,

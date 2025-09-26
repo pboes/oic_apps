@@ -26,16 +26,43 @@ export default function ContributingPage() {
         <p>
           Each app generates QR codes that interact with the Circles protocol.
           Users scan QR codes with a compatible wallet to send CRC tokens to a
-          specific contract address. When the transaction is detected, the app
-          performs its designated function.
+          specific recipient address. When the transaction is detected, the app
+          performs its designated function. The CRC tokens are forwarded as
+          ERC20 tokens to the recipient address specified by the app developer.
         </p>
 
         <h3>Technical Details</h3>
         <ul>
-          <li>Contract Address: 0x6fff09332ae273ba7095a2a949a7f4b89eb37c52</li>
+          <li>
+            Default OIC Contract: 0xf48554937f18885c7f15c432c596b5843648231d
+          </li>
           <li>Each app has a unique identifier (e.g., "random-number")</li>
           <li>Apps can specify custom amounts and additional data</li>
+          <li>
+            Apps can set custom recipient addresses for CRC token forwarding
+          </li>
+          <li>
+            CRC tokens are forwarded as ERC20 tokens to the specified recipient
+          </li>
           <li>Real-time database monitoring via WebSocket connection</li>
+        </ul>
+
+        <h3>Recipient Addresses</h3>
+        <p>
+          Each app can specify where CRC tokens should be sent by setting the{" "}
+          <code>recipient</code> field in their metadata. This is the Ethereum
+          address that will receive the CRC tokens as ERC20 tokens when users
+          interact with your app.
+        </p>
+        <ul>
+          <li>
+            If no recipient is specified, tokens go to the default OIC address
+          </li>
+          <li>
+            App developers can set their own address to receive payments
+            directly
+          </li>
+          <li>Useful for monetizing apps or funding specific projects</li>
         </ul>
 
         <h3>Adding Your Own App</h3>
@@ -80,6 +107,7 @@ const metadata = {
   title: 'Your App Title',
   description: 'Brief description of what your app does.',
   amount: 1, // Cost in CRC tokens
+  recipient: '0xYourAddressHere', // Where CRC tokens are sent (optional, defaults to OIC)
   initialState: {
     // Your app's initial state
   },
@@ -129,6 +157,10 @@ export default createOICApp(metadata, appContent);`}</pre>
           </li>
           <li>
             <code>amount</code>: Cost in CRC tokens (defaults to 1)
+          </li>
+          <li>
+            <code>recipient</code>: Ethereum address where CRC tokens are
+            forwarded as ERC20 tokens (optional, defaults to OIC address)
           </li>
           <li>
             <code>initialState</code>: Your app's initial state object

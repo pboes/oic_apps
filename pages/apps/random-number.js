@@ -7,6 +7,7 @@ const metadata = {
   description:
     "Send exactly 1 CRC to generate a random number between 1 and 1000.",
   amount: 1,
+  recipient: "0xf48554937f18885c7f15c432c596b5843648231d", // Example: set custom recipient
   initialState: {
     qrCode: "",
     randomNumber: null,
