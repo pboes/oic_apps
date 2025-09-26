@@ -61,7 +61,11 @@ export default function ContributingPage() {
         </ol>
 
         <h3>App Structure</h3>
-        <p>Each app should follow this basic structure:</p>
+        <p>
+          Apps now use a simple metadata-based structure. The framework
+          automatically handles the layout, logo, navigation, and event
+          handling:
+        </p>
         <pre
           style={{
             backgroundColor: "#f5f5f5",
@@ -69,41 +73,69 @@ export default function ContributingPage() {
             fontSize: "12px",
             fontFamily: "monospace",
           }}
-        >{`import { useOICFramework, OICStyles } from '../../lib/oic-framework';
+        >{`import { createOICApp, OICStyles } from '../../lib/oic-framework';
 
-const APP_ID = 'your-app-name';
+const metadata = {
+  appId: 'your-app-name',
+  title: 'Your App Title',
+  description: 'Brief description of what your app does.',
+  amount: 1, // Cost in CRC tokens
+  initialState: {
+    // Your app's initial state
+  },
+  onPayment: (eventData, appState, setAppState) => {
+    // What happens when payment is received
+    setAppState(prev => ({ ...prev, /* update state */ }));
+  },
+};
 
-export default function YourApp() {
-  const { isConnected, generateQR, registerEventHandler } = useOICFramework();
-
-  // Set up event handling
-  useEffect(() => {
-    const criteria = {
-      recipient: '0xf48554937f18885c7f15c432c596b5843648231d',
-      amount: '1000000000000000000', // 1 CRC
-      data: APP_ID,
-    };
-
-    registerEventHandler('your-handler', criteria, (eventData) => {
-      // Do something when payment is received
-    });
-  }, []);
-
+const appContent = ({ appState, setAppState, generateQR, metadata }) => {
   return (
-    <div style={OICStyles.container}>
-      {/* Your app UI */}
-    </div>
+    <>
+      {/* Your app's UI content goes here */}
+      {/* The framework handles logo, title, navigation automatically */}
+    </>
   );
-}`}</pre>
+};
+
+export default createOICApp(metadata, appContent);`}</pre>
 
         <h3>Design Guidelines</h3>
         <ul>
-          <li>Keep the retro, minimal aesthetic</li>
+          <li>
+            Focus only on your app's core content - the framework handles the
+            layout
+          </li>
           <li>Use the provided OICStyles for consistency</li>
           <li>No emojis or colorful buttons</li>
-          <li>Only show connection warnings when disconnected</li>
-          <li>Avoid verbose debug information</li>
-          <li>Focus on the core functionality</li>
+          <li>
+            The framework automatically handles logo, navigation, and connection
+            status
+          </li>
+          <li>Keep your app content minimal and focused</li>
+          <li>Define your app behavior in the metadata object</li>
+        </ul>
+
+        <h3>Metadata Options</h3>
+        <ul>
+          <li>
+            <code>appId</code>: Unique identifier for your app
+          </li>
+          <li>
+            <code>title</code>: Display name of your app
+          </li>
+          <li>
+            <code>description</code>: Brief description shown to users
+          </li>
+          <li>
+            <code>amount</code>: Cost in CRC tokens (defaults to 1)
+          </li>
+          <li>
+            <code>initialState</code>: Your app's initial state object
+          </li>
+          <li>
+            <code>onPayment</code>: Function called when payment is received
+          </li>
         </ul>
 
         <h3>Questions?</h3>
