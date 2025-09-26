@@ -32,7 +32,7 @@ export default function ContributingPage() {
 
         <h3>Technical Details</h3>
         <ul>
-          <li>Contract Address: 0xf48554937f18885c7f15c432c596b5843648231d</li>
+          <li>Contract Address: 0x6fff09332ae273ba7095a2a949a7f4b89eb37c52</li>
           <li>Each app has a unique identifier (e.g., "random-number")</li>
           <li>Apps can specify custom amounts and additional data</li>
           <li>Real-time database monitoring via WebSocket connection</li>

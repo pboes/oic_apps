@@ -22,14 +22,9 @@ export default function HomePage() {
             style={{ maxWidth: "200px", height: "auto" }}
           />
         </div>
-        <h2>Open Internet Club</h2>
+        <h2>Open Internet Club Apps</h2>
 
-        <p>
-          Welcome to the Open Internet Club - a collection of experimental web
-          apps that interact with blockchain technology in creative ways.
-        </p>
-
-        <h3>Apps</h3>
+        <p>A collection of things you can do with $OPEN.</p>
         <ul>
           {APPS.map((app) => (
             <li key={app.id}>
