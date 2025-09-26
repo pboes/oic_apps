@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { value } = req.body;
+    const { value, data } = req.body;
 
     if (!value) {
       return res.status(400).json({ error: "Value is required" });
@@ -28,14 +28,15 @@ export default async function handler(req, res) {
 
     // Set the required parameters
     const onBehalf = ethers.ZeroAddress; // null address
-    const recipient = "0xf48554937f18885c7f15c432c596b5843648231D";
-    const sliderValue = parseInt(value);
+    const recipient = "0xf48554937f18885c7f15c432c596b5843648231d";
+    const amount = parseInt(value);
+    const dataField = data || value.toString(); // Use provided data or fallback to value
 
     // Pack the data using the packData function
-    const packedData = packData(onBehalf, recipient, sliderValue.toString());
+    const packedData = packData(onBehalf, recipient, dataField);
 
     // Create the kitchen.app.metri.xyz URL
-    const kitchenUrl = `https://kitchen.app.metri.xyz/transfer/0x6fff09332ae273ba7095a2a949a7f4b89eb37c52/crc/${sliderValue}?data=${packedData}`;
+    const kitchenUrl = `https://kitchen.app.metri.xyz/transfer/0x6fff09332ae273ba7095a2a949a7f4b89eb37c52/crc/${amount}?data=${packedData}`;
 
     const qrCodeDataURL = await QRCode.toDataURL(kitchenUrl, {
       width: 300,
@@ -51,6 +52,7 @@ export default async function handler(req, res) {
       success: true,
       qrCode: qrCodeDataURL,
       value: value,
+      data: dataField,
       url: kitchenUrl,
       packedData: packedData,
     });

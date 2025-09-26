@@ -21,7 +21,7 @@ const pool = new Pool({
   ssl: false,
 });
 
-let lastRowCount = 0;
+let lastTimestamp = 0;
 
 app.prepare().then(() => {
   const server = createServer(async (req, res) => {
@@ -53,26 +53,52 @@ app.prepare().then(() => {
   // Database monitoring
   const checkForChanges = async () => {
     try {
+      // Get new transactions since last check
       const result = await pool.query(
-        'SELECT COUNT(*) as count FROM "CrcV2_OIC_OpenMiddlewareTransfer"',
+        `SELECT "blockNumber", timestamp, "transactionHash", "onBehalf", sender, recipient, amount, data
+         FROM "CrcV2_OIC_OpenMiddlewareTransfer"
+         WHERE timestamp > $1
+         ORDER BY timestamp ASC
+         LIMIT 10`,
+        [lastTimestamp],
       );
-      const currentCount = parseInt(result.rows[0].count);
 
-      if (lastRowCount === 0) {
-        lastRowCount = currentCount;
-        console.log(`Initial row count: ${currentCount}`);
-      } else if (currentCount > lastRowCount) {
-        const newRows = currentCount - lastRowCount;
-        console.log(`New rows detected: ${newRows}`);
+      if (result.rows.length > 0) {
+        console.log(`New transactions detected: ${result.rows.length}`);
 
-        io.emit("db-change", {
-          table: "CrcV2_OIC_OpenMiddlewareTransfer",
-          newRows: newRows,
-          totalRows: currentCount,
-          timestamp: new Date().toISOString(),
-        });
+        // Process each new transaction
+        for (const row of result.rows) {
+          // Convert bytea data to string if it exists
+          let dataString = null;
+          if (row.data) {
+            try {
+              // Convert Buffer to string (assuming UTF-8)
+              dataString = row.data.toString("utf8");
+            } catch (e) {
+              // If conversion fails, convert to hex
+              dataString = row.data.toString("hex");
+            }
+          }
 
-        lastRowCount = currentCount;
+          console.log(
+            `Processing transaction: ${row.transactionHash} - Sender: ${row.sender}, Recipient: ${row.recipient}, Amount: ${row.amount}, Data: ${dataString}`,
+          );
+
+          io.emit("db-change", {
+            sender: row.sender,
+            recipient: row.recipient,
+            amount: row.amount ? row.amount.toString() : "0",
+            data: dataString,
+            blockNumber: row.blockNumber,
+            transactionHash: row.transactionHash,
+            onBehalf: row.onBehalf,
+            table: "CrcV2_OIC_OpenMiddlewareTransfer",
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        // Update lastTimestamp to the most recent transaction timestamp
+        lastTimestamp = result.rows[result.rows.length - 1].timestamp;
       }
     } catch (error) {
       console.error("Database monitoring error:", error);
