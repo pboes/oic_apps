@@ -30,10 +30,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "App ID (data field) is required" });
     }
 
+    if (!recipient) {
+      return res.status(400).json({ error: "Recipient address is required" });
+    }
+
     // Set the required parameters
     const onBehalf = ethers.ZeroAddress; // null address
-    const recipientAddress =
-      recipient || "0xf48554937f18885c7f15c432c596b5843648231d";
+    const recipientAddress = recipient;
     const amount = parseInt(value);
 
     // Combine appId and customData if provided

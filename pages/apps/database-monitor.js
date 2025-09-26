@@ -5,8 +5,9 @@ const metadata = {
   appId: "database-monitor",
   title: "Database Monitor",
   description:
-    "Pay 1 CRC to activate real-time database monitoring for 60 seconds.",
+    "Pay 1 $OPEN to activate real-time database monitoring for 60 seconds.",
   amount: 1,
+  recipient: "0xf48554937f18885c7f15c432c596b5843648231d", // Required recipient address
   initialState: {
     qrCode: "",
     monitoringActive: false,
@@ -98,7 +99,7 @@ const appContent = ({ appState, setAppState, generateQR, metadata }) => {
             style={{ maxWidth: "250px" }}
           />
           <p style={{ margin: "10px 0", fontSize: "14px", color: "#666" }}>
-            Cost: {metadata.amount} CRC • Duration: 60 seconds
+            Cost: {metadata.amount} $OPEN • Duration: 60 seconds
           </p>
         </div>
       )}
