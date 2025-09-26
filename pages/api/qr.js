@@ -35,8 +35,8 @@ export default async function handler(req, res) {
     // Pack the data using the packData function
     const packedData = packData(onBehalf, recipient, dataField);
 
-    // Create the kitchen.app.metri.xyz URL
-    const kitchenUrl = `https://kitchen.app.metri.xyz/transfer/0x6fff09332ae273ba7095a2a949a7f4b89eb37c52/crc/${amount}?data=${packedData}`;
+    // Create the app.metri.xyz URL
+    const kitchenUrl = `https://app.metri.xyz/transfer/0x6fff09332ae273ba7095a2a949a7f4b89eb37c52/crc/${amount}?data=${packedData}`;
 
     const qrCodeDataURL = await QRCode.toDataURL(kitchenUrl, {
       width: 300,
