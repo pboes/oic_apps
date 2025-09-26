@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { OICStyles } from "../lib/oic-framework";
+import { OICStyles } from "../lib/oic-styles";
 
 export default function OICAppLayout({
   title,
   description,
   children,
-  isConnected = true
+  isConnected = true,
 }) {
   return (
     <div style={OICStyles.container}>

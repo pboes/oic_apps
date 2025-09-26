@@ -1,4 +1,5 @@
-import { createOICApp, OICStyles } from "../../lib/oic-framework";
+import { createOICApp } from "../../lib/oic-framework";
+import { OICStyles } from "../../lib/oic-styles";
 import { useState, useEffect } from "react";
 
 const metadata = {
