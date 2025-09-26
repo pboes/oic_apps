@@ -26,14 +26,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Value is required" });
     }
 
+    if (!data) {
+      return res.status(400).json({ error: "App ID (data field) is required" });
+    }
+
     // Set the required parameters
     const onBehalf = ethers.ZeroAddress; // null address
     const recipient = "0xf48554937f18885c7f15c432c596b5843648231d";
     const amount = parseInt(value);
-    const dataField = data || value.toString(); // Use provided data or fallback to value
+    const appId = data; // Use the app ID as the data field
 
     // Pack the data using the packData function
-    const packedData = packData(onBehalf, recipient, dataField);
+    const packedData = packData(onBehalf, recipient, appId);
 
     // Create the app.metri.xyz URL
     const kitchenUrl = `https://app.metri.xyz/transfer/0x6fff09332ae273ba7095a2a949a7f4b89eb37c52/crc/${amount}?data=${packedData}`;
@@ -52,7 +56,9 @@ export default async function handler(req, res) {
       success: true,
       qrCode: qrCodeDataURL,
       value: value,
-      data: dataField,
+      amount: amount,
+      appId: appId,
+      data: appId, // Keep for backward compatibility
       url: kitchenUrl,
       packedData: packedData,
     });
